@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import numpy as np
 import matplotlib.pyplot as plt
-from past.builtins import xrange
+#from past.builtins import xrange
 
 class TwoLayerNet(object):
   """
@@ -69,14 +69,18 @@ class TwoLayerNet(object):
     W2, b2 = self.params['W2'], self.params['b2']
     N, D = X.shape
 
+    fc1 = np.dot(X, W1) + b1
+    fc1[fc1 < 0] = 0
+
     # Compute the forward pass
-    scores = None
+    scores = np.dot(fc1, W2) + b2
+
     #############################################################################
     # TODO: Perform the forward pass, computing the class scores for the input. #
     # Store the result in the scores variable, which should be an array of      #
     # shape (N, C).                                                             #
     #############################################################################
-    pass
+
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
@@ -86,7 +90,15 @@ class TwoLayerNet(object):
       return scores
 
     # Compute the loss
-    loss = None
+    regularization = reg * (np.sum(np.power(W1, 2)) + np.sum(np.power(W2, 2)))
+    c = 0
+    for i in np.arange(5):
+      c += (-np.log(np.exp(scores[i,:]) / np.sum(np.exp(scores[i,:]))))[y[i]]
+      print(np.exp(scores[i,:]) / np.sum(np.exp(scores[i,:])))
+      print((-np.log(np.exp(scores[i,:]) / np.sum(np.exp(scores[i,:]))))[y[i]])
+    print((c + regularization) / N, c, regularization)
+    #loss = np.sum(-np.log(np.exp(scores) / np.sum(np.exp(scores)))) + regularization
+    loss = (c + regularization) / N
     #############################################################################
     # TODO: Finish the forward pass, and compute the loss. This should include  #
     # both the data loss and L2 regularization for W1 and W2. Store the result  #
@@ -141,7 +153,7 @@ class TwoLayerNet(object):
     train_acc_history = []
     val_acc_history = []
 
-    for it in xrange(num_iters):
+    for it in np.arange(num_iters):
       X_batch = None
       y_batch = None
 
